@@ -29,8 +29,8 @@ A modern URL shortener service built with Go, featuring Redis for caching and Po
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/url-shortener.git
-cd url-shortener
+git clone https://github.com/yourusername/tinylink.git
+cd tinylink
 ```
 
 2. Set up the environment:
@@ -92,7 +92,7 @@ Note: Short URLs (e.g., `http://localhost:8080/abc123`) automatically redirect t
 
 ### Project Structure
 ```
-url-shortener/
+tinylink/
 ├── cmd/
 │   └── server/
 │       └── main.go          # Application entry point
