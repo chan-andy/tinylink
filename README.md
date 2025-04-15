@@ -1,6 +1,6 @@
 # URL Shortener Service
 
-A modern URL shortener service built with Go, featuring Redis for storage and real-time analytics.
+A modern URL shortener service built with Go, featuring Redis for caching and PostgreSQL for persistent storage.
 
 ## Features
 
@@ -8,7 +8,6 @@ A modern URL shortener service built with Go, featuring Redis for storage and re
 - 📊 Real-time click tracking and analytics
 - ⚡ Redis caching for fast redirects
 - 🔍 URL validation and normalization
-- 🌐 Clean and modern web interface
 - 🔒 Input sanitization and security checks
 - 🐳 Docker support for easy deployment
 
@@ -16,7 +15,8 @@ A modern URL shortener service built with Go, featuring Redis for storage and re
 
 - Go 1.21+
 - Gin Web Framework
-- Redis
+- Redis for caching
+- PostgreSQL for persistent storage
 - Docker & Docker Compose
 
 ## Prerequisites
@@ -39,7 +39,7 @@ cp .env.example .env
 # Edit .env with your configurations if needed
 ```
 
-3. Start Redis using Docker:
+3. Start the infrastructure using Docker:
 ```bash
 docker compose up -d
 ```
@@ -51,32 +51,42 @@ go run cmd/server/main.go
 
 The server will start at `http://localhost:8080`
 
-## API Endpoints
+## API Reference
 
 ### Create Short URL
 ```http
 POST /api/v1/shorten
 Content-Type: application/json
 
+Request:
 {
-    "long_url": "https://example.com/very/long/url"
+    "long_url": "https://example.com/very/long/url",
+    "custom_alias": "my-custom-url"  // optional
 }
-```
 
-### Get URL Information
-```http
-GET /api/v1/info/:code
-```
-
-### Redirect to Original URL
-```http
-GET /:code
+Response:
+{
+    "short_url": "http://localhost:8080/abc123",
+    "original_url": "https://example.com/very/long/url",
+    "created_at": "2024-03-20T15:30:00Z"
+}
 ```
 
 ### Health Check
 ```http
 GET /health
+
+Response:
+{
+    "status": "ok",
+    "services": {
+        "redis": "up",
+        "postgres": "up"
+    }
+}
 ```
+
+Note: Short URLs (e.g., `http://localhost:8080/abc123`) automatically redirect to their original URLs.
 
 ## Development
 
@@ -86,13 +96,12 @@ url-shortener/
 ├── cmd/
 │   └── server/
 │       └── main.go          # Application entry point
-├── internal/                # Private application code
-├── static/                  # Static web files
-├── .env.example            # Example environment variables
-├── .gitignore             # Git ignore rules
-├── docker-compose.yml     # Docker compose configuration
-├── go.mod                 # Go module file
-└── README.md             # This file
+├── internal/              # Private application code
+├── .env.example          # Example environment variables
+├── .gitignore           # Git ignore rules
+├── docker-compose.yml    # Docker compose configuration
+├── go.mod               # Go module file
+└── README.md            # This file
 ```
 
 ### Environment Variables
@@ -101,12 +110,13 @@ url-shortener/
 |----------|-------------|---------|
 | PORT | Server port | 8080 |
 | REDIS_URL | Redis connection URL | localhost:6379 |
+| POSTGRES_URL | PostgreSQL connection URL | postgres://postgres:postgres@localhost:5432/urlshortener |
 | BASE_URL | Base URL for shortened links | http://localhost:8080 |
 
 ## Security Considerations
 
 - URLs are validated and sanitized before processing
-- Rate limiting can be easily added using Redis
+- Rate limiting implemented using Redis
 - All user inputs are properly sanitized
 - No sensitive information is exposed in shortened URLs
 
@@ -127,4 +137,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Gin Web Framework](https://github.com/gin-gonic/gin)
 - [go-redis](https://github.com/redis/go-redis)
 - [godotenv](https://github.com/joho/godotenv) 
-This project is licensed under the MIT License - see the LICENSE file for details. 
