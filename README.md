@@ -29,7 +29,7 @@ A modern URL shortener service built with Go, featuring Redis for caching and Po
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/tinylink.git
+git clone https://github.com/chan-andy/tinylink.git
 cd tinylink
 ```
 
